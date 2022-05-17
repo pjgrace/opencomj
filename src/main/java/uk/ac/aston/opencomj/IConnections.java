@@ -12,7 +12,7 @@
  * write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package uk.ac.lancs.opencomj;
+package uk.ac.aston.opencomj;
 /**
  * The IConnection interface is implemented by every component with a
  * receptacle. This interface should never be called by the application, and

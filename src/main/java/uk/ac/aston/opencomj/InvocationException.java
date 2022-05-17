@@ -25,7 +25,7 @@
 //
 /////////////////////////////////////////////////////////////////////////
 
-package uk.ac.lancs.opencomj;
+package uk.ac.aston.opencomj;
 
 /**
  * Exception identifying an error in a pre/post based invocation.

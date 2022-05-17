@@ -25,7 +25,7 @@
 //
 /////////////////////////////////////////////////////////////////////////
 
-package uk.ac.lancs.opencomj;
+package uk.ac.aston.opencomj;
 
 /**
  * Exception thrown only during the call to create a component. Either

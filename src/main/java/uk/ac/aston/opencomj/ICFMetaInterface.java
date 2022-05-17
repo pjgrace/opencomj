@@ -3,7 +3,7 @@
  *
  * Created on 11 August 2004, 14:58
  */
-package uk.ac.lancs.opencomj;
+package uk.ac.aston.opencomj;
 
 import java.util.List;
 

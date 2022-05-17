@@ -4,7 +4,7 @@
  * Created on 23 July 2004, 13:52
  */
 
-package uk.ac.lancs.opencomj;
+package uk.ac.aston.opencomj;
 
 import java.util.ArrayList;
 import java.util.HashMap;

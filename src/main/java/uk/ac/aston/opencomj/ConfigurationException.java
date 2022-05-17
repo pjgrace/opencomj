@@ -25,7 +25,7 @@
 //
 /////////////////////////////////////////////////////////////////////////
 
-package uk.ac.lancs.opencomj;
+package uk.ac.aston.opencomj;
 
 /**
  * Exception that occurs when there is a problem configuring the

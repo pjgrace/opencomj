@@ -12,12 +12,18 @@
  * write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package uk.ac.lancs.opencomj;
+package uk.ac.aston.opencomj;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import uk.ac.aston.opencomj.privacy.DataProcess;
+import uk.ac.aston.opencomj.privacy.MetaDataFlow;
+import uk.ac.aston.opencomj.privacy.PrivacyFunction;
+import uk.ac.aston.opencomj.privacy.Private;
 
 
 /**
@@ -54,6 +60,11 @@ public class OpenCOM implements IOpenCOM, IMetaArchitecture, IUnknown, IMetaInte
      * The internal meta interface object for the kernel.
      */
     private final transient MetaInterface metaObject;
+    
+    /**
+     * The DFD runtime model
+     */
+    private final transient MetaDataFlow metaDFD;
 
     /**
      * Constructor that creates a new instance of the OpenCOM runtime kernel.
@@ -62,6 +73,7 @@ public class OpenCOM implements IOpenCOM, IMetaArchitecture, IUnknown, IMetaInte
         mGraph = new ArrayList();
         mcConnID = 1;
         metaObject = new MetaInterface((IOpenCOM) this, this);
+        metaDFD = new MetaDataFlow();
     }
 
     // Implementation for the IMetaArchitecture interface of the OpenCOM runtime
@@ -224,6 +236,8 @@ public class OpenCOM implements IOpenCOM, IMetaArchitecture, IUnknown, IMetaInte
         return true;
     }
 
+    
+    
     @Override
     public final IUnknown createInstance(final String componentType, final String componentName)
             throws InvalidComponentTypeException{
@@ -251,7 +265,6 @@ public class OpenCOM implements IOpenCOM, IMetaArchitecture, IUnknown, IMetaInte
             throw new InvalidComponentTypeException("Unknown component type" + componentType + "; check class name");
         }
 
-
         final Class[] intArgsClass = new Class[] {IUnknown.class};
         final Object[] intArgs = new Object[] {(IUnknown) this};
 
@@ -278,7 +291,6 @@ public class OpenCOM implements IOpenCOM, IMetaArchitecture, IUnknown, IMetaInte
             }
         }
 
-
         // If it's a valid component then we can add delegators and place it in the graph
         if (validComponent) {
             //Record it at next free position on graph
@@ -292,20 +304,43 @@ public class OpenCOM implements IOpenCOM, IMetaArchitecture, IUnknown, IMetaInte
                         || (intfName.equalsIgnoreCase("IMetaInterface"))
                         || (intfName.equalsIgnoreCase("ILifeCycle"))) {
                     // do not attach delegators to standard OpenCOM interfaces
-
-                    // We now need to attach delegators to each of the "non-component" interfaces
-                    // Create a new delegator to be attached
-                    final Delegator del = new Delegator(pIUnknown, (IMetaInterception) this);
-                    final IDelegator pDel = (IDelegator) del;
-                    final Object tempDel = del.newInstance(pIUnknown);
-                    del.setHigherObject(tempDel);
-                    if (intfName.equalsIgnoreCase("IUnknown")) {
-                        // This is the special case - we need to replace the Component reference
-                        // in the graph with the delegated component reference
-                        delComponent = tempDel;
-                        mGraph.get(index).setComponent(delComponent);
+                    
+                    boolean isPrivate = MetaDataFlow.isPrivateMethod(interfaceList1);
+                    IDelegator pDel = null;
+                    if(isPrivate){
+                        final PrivacyDelegator del = new PrivacyDelegator(pIUnknown, (IMetaInterception) this);
+                        pDel = (IDelegator) del;
+                        final Object tempDel = del.newInstance(pIUnknown);
+                        del.setHigherObject(tempDel);
+                        if (intfName.equalsIgnoreCase("IUnknown")) {
+                            // This is the special case - we need to replace the Component reference
+                            // in the graph with the delegated component reference
+                            delComponent = tempDel;
+                            mGraph.get(index).setComponent(delComponent);
+                        }
                     }
-
+                    else {
+                        // We now need to attach delegators to each of the "non-component" interfaces
+                        // Create a new delegator to be attached
+                        final Delegator del = new Delegator(pIUnknown, (IMetaInterception) this);
+                        pDel = (IDelegator) del;
+                        final Object tempDel = del.newInstance(pIUnknown);
+                        del.setHigherObject(tempDel);
+                        if (intfName.equalsIgnoreCase("IUnknown")) {
+                            // This is the special case - we need to replace the Component reference
+                            // in the graph with the delegated component reference
+                            delComponent = tempDel;
+                            mGraph.get(index).setComponent(delComponent);
+                        }
+                    }
+                    
+                    //
+                    boolean isPrivateInterface = MetaDataFlow.isPrivateInterface(interfaceList1);
+                    if (isPrivateInterface) {
+                        DataProcess dProcess = MetaDataFlow.getProcessFromInterface(interfaceList1);
+                        metaDFD.addDataFunction(dProcess);
+                    }
+                    
                     //Create OCMDelegatorInfo structure for new list entry
                     //Add it to the list
                     mGraph.get(index).getDelegators().add(new OCMDelegatorInfo(pDel, intfName));
@@ -586,4 +621,8 @@ public class OpenCOM implements IOpenCOM, IMetaArchitecture, IUnknown, IMetaInte
         }
         return null;
     }
+    
+    
+    // IUpdateMetaDataFlow
+    
 }

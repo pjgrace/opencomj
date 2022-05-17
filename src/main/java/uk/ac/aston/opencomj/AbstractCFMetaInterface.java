@@ -10,7 +10,7 @@
  * write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package uk.ac.lancs.opencomj;
+package uk.ac.aston.opencomj;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -220,7 +220,7 @@ public abstract class AbstractCFMetaInterface implements ICFMetaInterface, ILife
      * @param componentType The type of the component to create.
      * @param componentName The unique name of the component to create.
      * @return A reference to the newly created component instance.
-     * @throws uk.ac.lancs.opencomj.InvalidComponentTypeException
+     * @throws uk.ac.aston.opencomj.InvalidComponentTypeException
      * @see OpenCOM.IUnknown
      */
     @Override

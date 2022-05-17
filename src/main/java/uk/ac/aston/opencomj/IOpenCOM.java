@@ -12,7 +12,7 @@
  * write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-package uk.ac.lancs.opencomj;
+package uk.ac.aston.opencomj;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public interface IOpenCOM extends IUnknown {
      * @param componentType the string describing the component type i.e. the Java class of the component.
      * @param componentName the string representing the unique (user defined) name of the component.
      * @return an Object that is the reference to the created component. Null indicates failure.
-     * @throws uk.ac.lancs.opencomj.InvalidComponentTypeException
+     * @throws uk.ac.aston.opencomj.InvalidComponentTypeException
      * @see java.lang.Object
      **/
     IUnknown createInstance(String componentType, String componentName) throws InvalidComponentTypeException;
